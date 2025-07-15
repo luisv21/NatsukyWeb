@@ -1,127 +1,191 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&display=swap">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      text-align: center;
+      padding: 30px 20px 15px;
+      background-color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .header img {
+      width: 100px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin: 0;
+      color: #0d2b45;
+    }
+
+    .header .subtitle {
+      font-size: 1rem;
+      color: #666;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      min-width: 180px;
+    }
+
+    .copy-btn {
+      padding: 10px 20px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .grid {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .card h3 {
+      color: #007bff;
+      margin-top: 0;
+    }
+
+    .card p {
+      margin: 6px 0;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .filters {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img src="{{ url_for('static', filename='dojo_banzai_logo.jpg') }}" alt="Logo Dojo" class="logo">
-            <h1>{{ title }}</h1>
-            <p class="subtitle">Competición oficial - Modalidad Kata</p>
-        </div>
 
-        <div class="controls">
-            <div class="control-group">
-                <input type="text" placeholder="🔍 Buscar competidor..." id="searchInput">
-            </div>
-            <div class="control-group">
-                <select id="categoryFilter">
-                    <option value="">📊 Todas las categorías</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <select id="poolFilter">
-                    <option value="">🏊 Todos los pools</option>
-                </select>
-            </div>
-            <button class="copy-link" onclick="copyLink()">
-                🔗 Compartir
-            </button>
-        </div>
+  <div class="header">
+    <img src="{{ url_for('static', filename='dojo_banzai_logo.jpg') }}" alt="Logo">
+    <h1>{{ title }}</h1>
+    <p class="subtitle">Competición oficial - Modalidad Kata</p>
+  </div>
 
-        <div class="cards-grid" id="cardsGrid">
-            {% for row in data %}
-                <div class="card" data-category="{{ row['Categoría'] }}" data-pool="{{ row['Pool'] }}">
-                    <div class="card-header">
-                        <div class="belt-rank">🥋</div>
-                        <div class="fighter-info">
-                            <div class="fighter-avatar">
-                                {{ row['Nombre y Apellido'][:1] }}
-                            </div>
-                            <div class="fighter-details">
-                                <h3>{{ row['Nombre y Apellido'] }}</h3>
-                                <div class="category-tag">{{ row['Categoría'] }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <span class="stat-icon">🥋</span>
-                                <div class="stat-label">Kata</div>
-                                <div class="stat-value">{{ row['Nombre Kata'] }}</div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-icon">🏟️</span>
-                                <div class="stat-label">Tatami</div>
-                                <div class="stat-value">{{ row['Tatami'] }}</div>
-                            </div>
-                            <div class="pool-indicator">
-                                🏊 Pool {{ row['Pool'] }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
+  <div class="filters">
+    <input type="text" id="searchInput" placeholder="🔍 Buscar competidor...">
+    <select id="categoryFilter">
+      <option value="">📊 Todas las categorías</option>
+    </select>
+    <select id="poolFilter">
+      <option value="">🏊 Todos los pools</option>
+    </select>
+    <button class="copy-btn" onclick="copyLink()">🔗 Compartir</button>
+  </div>
+
+  <div class="grid" id="cardsGrid">
+    {% for d in data %}
+    <div class="card" data-name="{{ d['Nombre y Apellido']|lower }}" data-category="{{ d['Categoría'] }}" data-pool="{{ d['Pool'] }}">
+      <h3>{{ d['Nombre y Apellido'] }}</h3>
+      <p><span class="label">Categoría:</span> {{ d['Categoría'] }}</p>
+      <p><span class="label">Kata:</span> {{ d['Nombre Kata'] }}</p>
+      <p><span class="label">Tatami:</span> {{ d['Tatami'] }}</p>
+      <p><span class="label">Pool:</span> {{ d['Pool'] }}</p>
     </div>
+    {% endfor %}
+  </div>
 
-    <script>
-        function copyLink() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                const button = document.querySelector('.copy-link');
-                const originalText = button.textContent;
-                button.textContent = '✅ Copiado!';
-                setTimeout(() => {
-                    button.textContent = originalText;
-                }, 2000);
-            });
-        }
-        const searchInput = document.getElementById('searchInput');
-        const categoryFilter = document.getElementById('categoryFilter');
-        const poolFilter = document.getElementById('poolFilter');
-        const cards = document.querySelectorAll('.card');
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const poolFilter = document.getElementById('poolFilter');
+    const cards = document.querySelectorAll('.card');
 
-        const categories = new Set();
-        const pools = new Set();
-        cards.forEach(card => {
-            categories.add(card.dataset.category);
-            pools.add(card.dataset.pool);
-        });
-        categories.forEach(cat => {
-            const opt = document.createElement('option');
-            opt.value = opt.textContent = cat;
-            categoryFilter.appendChild(opt);
-        });
-        pools.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = opt.textContent = p;
-            poolFilter.appendChild(opt);
-        });
+    function updateFilters() {
+      const name = searchInput.value.toLowerCase();
+      const cat = categoryFilter.value;
+      const pool = poolFilter.value;
 
-        function filterCards() {
-            const name = searchInput.value.toLowerCase();
-            const cat = categoryFilter.value;
-            const pool = poolFilter.value;
-            cards.forEach(card => {
-                const matchName = card.textContent.toLowerCase().includes(name);
-                const matchCat = !cat || card.dataset.category === cat;
-                const matchPool = !pool || card.dataset.pool === pool;
-                card.style.display = matchName && matchCat && matchPool ? 'block' : 'none';
-            });
-        }
+      cards.forEach(card => {
+        const matchesName = card.dataset.name.includes(name);
+        const matchesCat = !cat || card.dataset.category === cat;
+        const matchesPool = !pool || card.dataset.pool === pool;
 
-        searchInput.addEventListener('input', filterCards);
-        categoryFilter.addEventListener('change', filterCards);
-        poolFilter.addEventListener('change', filterCards);
-    </script>
+        card.style.display = (matchesName && matchesCat && matchesPool) ? 'block' : 'none';
+      });
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        alert("✅ Enlace copiado al portapapeles");
+      });
+    }
+
+    function populateFilters() {
+      const cats = new Set();
+      const pools = new Set();
+      cards.forEach(card => {
+        cats.add(card.dataset.category);
+        pools.add(card.dataset.pool);
+      });
+
+      cats.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categoryFilter.appendChild(option);
+      });
+
+      pools.forEach(pool => {
+        const option = document.createElement('option');
+        option.value = pool;
+        option.textContent = pool;
+        poolFilter.appendChild(option);
+      });
+    }
+
+    searchInput.addEventListener('input', updateFilters);
+    categoryFilter.addEventListener('change', updateFilters);
+    poolFilter.addEventListener('change', updateFilters);
+
+    populateFilters();
+  </script>
+
 </body>
 </html>
