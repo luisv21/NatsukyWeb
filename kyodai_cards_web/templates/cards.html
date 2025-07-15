@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tarjetas Kyodai</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #003366;
+        }
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .filters input, .filters select {
+            padding: 8px;
+            font-size: 16px;
+        }
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1rem;
+            width: 280px;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.02);
+        }
+        .card h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #003366;
+        }
+        .card p {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Participantes Torneo Kyodai 2025</h1>
+<div class="filters">
+    <input type="text" id="search" placeholder="Buscar por nombre...">
+    <select id="filterCategoria">
+        <option value="">Todas las categorías</option>
+    </select>
+    <select id="filterPool">
+        <option value="">Todos los pools</option>
+    </select>
+</div>
+<div class="cards" id="cardContainer">
+    {% for d in data %}
+    <div class="card" data-nombre="{{ d['Nombre y Apellido'] }}" data-categoria="{{ d['Categoría'] }}" data-pool="{{ d['Pool'] }}">
+        <h2>{{ d['Nombre y Apellido'] }}</h2>
+        <p><strong>Categoría:</strong> {{ d['Categoría'] }}</p>
+        <p><strong>Kata:</strong> {{ d['Nombre Kata'] }}</p>
+        <p><strong>Tatami:</strong> {{ d['Tatami'] }}</p>
+        <p><strong>Pool:</strong> {{ d['Pool'] }}</p>
+    </div>
+    {% endfor %}
+</div>
+<script>
+    const searchInput = document.getElementById("search");
+    const filterCategoria = document.getElementById("filterCategoria");
+    const filterPool = document.getElementById("filterPool");
+    const cards = document.querySelectorAll(".card");
+    const categorias = new Set();
+    const pools = new Set();
+    cards.forEach(card => {
+        categorias.add(card.dataset.categoria);
+        pools.add(card.dataset.pool);
+    });
+    categorias.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        filterCategoria.appendChild(opt);
+    });
+    pools.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        filterPool.appendChild(opt);
+    });
+    function filtrar() {
+        const search = searchInput.value.toLowerCase();
+        const cat = filterCategoria.value;
+        const pool = filterPool.value;
+        cards.forEach(card => {
+            const nombre = card.dataset.nombre.toLowerCase();
+            const c = card.dataset.categoria;
+            const p = card.dataset.pool;
+            const matchNombre = nombre.includes(search);
+            const matchCategoria = !cat || c === cat;
+            const matchPool = !pool || p === pool;
+            card.style.display = (matchNombre && matchCategoria && matchPool) ? "block" : "none";
+        });
+    }
+    searchInput.addEventListener("input", filtrar);
+    filterCategoria.addEventListener("change", filtrar);
+    filterPool.addEventListener("change", filtrar);
+</script>
+</body>
+</html>
