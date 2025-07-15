@@ -1,28 +1,31 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Kyodai Cards Generator</title>
-    <style>
-        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; }
-        h1 { color: #003366; }
-        form { display: flex; flex-direction: column; gap: 1em; }
-        label { font-weight: bold; }
-        input[type="submit"] { padding: 10px; background: #003366; color: white; border: none; cursor: pointer; }
-    </style>
+    <title>Karate-Do Ryobu-kai Panamá</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Generador de Cards Kyodai</h1>
-    <form method="POST" enctype="multipart/form-data">
-        <label for="excel">Sube tu archivo Excel:</label>
-        <input type="file" name="excel" required>
-        <label for="mode">¿Qué tipo de tarjeta quieres generar?</label>
-        <select name="mode" required>
-            <option value="individual">Una por participante (imagen)</option>
-            <option value="categoria">Una por categoría (imagen)</option>
-        </select>
-        <input type="submit" value="Generar">
+<body class="bg-light">
+<div class="container py-5">
+    <h1 class="text-center mb-4 text-primary fw-bold">Kyodai Cards Generator</h1>
+    <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        <div class="mb-3">
+            <label for="page_title" class="form-label">Título de la página:</label>
+            <input type="text" class="form-control" name="page_title" placeholder="Ej. Participantes Torneo Kyodai 2025" required>
+        </div>
+        <div class="mb-3">
+            <label for="excel" class="form-label">Sube tu archivo Excel:</label>
+            <input type="file" class="form-control" name="excel" accept=".xlsx" required>
+        </div>
+        <div class="mb-3">
+            <label for="mode" class="form-label">Tipo de generación:</label>
+            <select class="form-select" name="mode">
+                <option value="individual">Cards individuales</option>
+                <option value="categoria">Cards por categoría</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Generar</button>
     </form>
+</div>
 </body>
 </html>
