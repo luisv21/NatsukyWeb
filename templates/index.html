@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Kyodai Cards Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
       margin: 0;
@@ -71,26 +72,53 @@
     }
   </style>
 </head>
-<body>
+<body class="bg-light">
 
-  <div class="container">
-    <h1>Kyodai Cards Generator</h1>
-    <form action="/" method="POST" enctype="multipart/form-data">
-      <label for="page_title">Título de la página:</label>
-      <input type="text" id="page_title" name="page_title" placeholder="Ej. Participantes Torneo Kyodai 2025">
+    <div class="container py-5">
+        <!-- LOGO -->
+        <div class="text-center mb-4">
+            <img src="{{ url_for('static', filename='img/dojo_banzai_logo.jpg') }}" alt="Dojo Banzai Logo" style="max-width: 150px;">
+        </div>
 
-      <label for="excel">Sube tu archivo Excel:</label>
-      <input type="file" name="excel" id="excel" accept=".xlsx,.xls">
+        <!-- TÍTULO -->
+        <h2 class="text-center mb-4 text-primary fw-bold">Kyodai Cards Generator</h2>
 
-      <label for="mode">Tipo de generación:</label>
-      <select name="mode" id="mode">
-        <option value="individual">Cards Individuales</option>
-        <option value="categoria">Por Categoría</option>
-      </select>
+        <!-- FORMULARIO -->
+        <div class="card shadow mx-auto" style="max-width: 500px;">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Título de la página:</label>
+                        <input type="text" name="page_title" class="form-control" placeholder="Ej. Participantes Torneo Kyodai 2025">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sube tu archivo Excel:</label>
+                        <input type="file" name="excel" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de generación:</label>
+                        <select name="mode" class="form-select" required>
+                            <option value="individual">Cards individuales</option>
+                            <option value="categoria">Cards por categoría</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Generar</button>
+                </form>
+            </div>
+        </div>
 
-      <button type="submit">Generar</button>
-    </form>
-  </div>
+        <!-- DESCARGA DE ARCHIVO DE EJEMPLO -->
+        <div class="text-center mt-4">
+            <a href="{{ url_for('static', filename='files/Participantes_Completo_Torneo_Kyodai_2025.xlsx') }}" class="btn btn-outline-primary" download>
+                Descargar archivo de ejemplo 📥
+            </a>
+        </div>
+    </div>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+
