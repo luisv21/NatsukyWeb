@@ -1,11 +1,13 @@
 # kyodai_cards_generator/app.py
 
-from flask import Flask, render_template, request, send_file, redirect, url_for
+from flask import Flask, render_template, request, send_file, redirect, url_for, make_response
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 import os
 import zipfile
 import uuid
+import io
+import random
 
 app = Flask(__name__)
 UPLOAD_FOLDER = "static/uploads"
@@ -103,6 +105,49 @@ def cards(session_id):
     df = pd.read_csv(data_path)
     return render_template("cards.html", data=df.to_dict(orient="records"))
 
+
+# ========= NUEVAS FUNCIONALIDADES =========
+
+def generar_datos_dummy(n=6):
+    NOMBRES = ["Lucía Ramos", "Diego Torres", "Valentina Gómez", "Luis Mendoza", "Sofía Romero", "Mateo López"]
+    CATEGORIAS = ["4 años", "6-7 Principiantes", "8-9 Intermedios"]
+    KATAS = ["Taikioku", "Heian Shodan", "Heian Nidan"]
+    TATAMIS = [1, 2, 3, 4]
+    POOLS = ["P1", "P2", "P3"]
+
+    data = []
+    for _ in range(n):
+        data.append({
+            "Nombre y Apellido": random.choice(NOMBRES),
+            "Categoría": random.choice(CATEGORIAS),
+            "Nombre Kata": random.choice(KATAS),
+            "Tatami": random.choice(TATAMIS),
+            "Pool": random.choice(POOLS)
+        })
+    return data
+
+
+@app.route('/preview')
+def preview():
+    dummy_data = generar_datos_dummy(6)
+    return render_template("cards.html", data=dummy_data, title="Vista de Ejemplo")
+
+
+@app.route('/example.xlsx')
+def descargar_ejemplo():
+    dummy_data = generar_datos_dummy(10)
+    df = pd.DataFrame(dummy_data)
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Participantes')
+    output.seek(0)
+    response = make_response(output.read())
+    response.headers["Content-Disposition"] = "attachment; filename=Ejemplo_Torneo_Kyodai.xlsx"
+    response.headers["Content-type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    return response
+
+
+# ========== FIN DE CAMBIOS =========
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
