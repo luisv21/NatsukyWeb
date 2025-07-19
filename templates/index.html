@@ -72,53 +72,44 @@
     }
   </style>
 </head>
-<body class="bg-light">
+<body class="bg-dark text-white">
+<div class="container py-5 text-center">
+    <img src="{{ url_for('static', filename='dojo_banzai_logo.jpg') }}" alt="Logo" style="max-width: 200px;" class="mb-4">
+    <h1 class="display-5 fw-bold text-info">Generador de Cards - Torneo Kyodai 🥋</h1>
+    <p class="lead mb-4">Sube el archivo con los participantes y genera las cards organizadas por categoría o individuales.</p>
 
-    <div class="container py-5">
-        <!-- LOGO -->
-        <div class="text-center mb-4">
-            <img src="{{ url_for('static', filename='img/dojo_banzai_logo.jpg') }}" alt="Dojo Banzai Logo" style="max-width: 150px;">
+    <form action="/generar" method="post" enctype="multipart/form-data" class="bg-secondary p-4 rounded shadow-sm">
+        <div class="mb-3">
+            <label for="titulo" class="form-label">Título del torneo</label>
+            <input type="text" name="titulo" id="titulo" class="form-control" placeholder="Ej: Torneo Kyodai 2025" required>
         </div>
-
-        <!-- TÍTULO -->
-        <h2 class="text-center mb-4 text-primary fw-bold">Ryobukai Cards Generator</h2>
-
-        <!-- FORMULARIO -->
-        <div class="card shadow mx-auto" style="max-width: 500px;">
-            <div class="card-body">
-                <form method="POST" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label class="form-label">Título de la página:</label>
-                        <input type="text" name="page_title" class="form-control" placeholder="Ej. Participantes Torneo Kyodai 2025">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Sube tu archivo Excel:</label>
-                        <input type="file" name="excel" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tipo de generación:</label>
-                        <select name="mode" class="form-select" required>
-                            <option value="individual">Cards individuales</option>
-                            <option value="categoria">Cards por categoría</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Generar</button>
-                </form>
-            </div>
+        <div class="mb-3">
+            <label for="archivo" class="form-label">Archivo Excel de participantes</label>
+            <input type="file" name="archivo" id="archivo" accept=".xlsx" class="form-control" required>
         </div>
-
-        <!-- DESCARGA DE ARCHIVO DE EJEMPLO -->
-        <div class="text-center mt-4">
-            <a href="{{ url_for('static', filename='files/Participantes_Completo_Torneo_Kyodai_2025.xlsx') }}" class="btn btn-outline-primary" download>
-                Descargar archivo de ejemplo 📥
-            </a>
+        <div class="mb-3">
+            <label for="modo" class="form-label">Tipo de generación</label>
+            <select name="modo" id="modo" class="form-select" required>
+                <option value="individual">Cards individuales</option>
+                <option value="categoria">Agrupado por categoría</option>
+            </select>
         </div>
+        <button type="submit" class="btn btn-success w-100">🎴 Generar cards</button>
+    </form>
+
+    <!-- BOTONES DE PREVIEW Y DESCARGA DE EJEMPLO -->
+    <div class="d-flex gap-3 justify-content-center mt-4 flex-wrap">
+        <a href="/preview" class="btn btn-outline-info">
+            👀 Ver ejemplo de cards
+        </a>
+        <a href="/example.xlsx" class="btn btn-outline-secondary">
+            📄 Descargar archivo de ejemplo
+        </a>
     </div>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
 
 
