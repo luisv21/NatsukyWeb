@@ -3,189 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <title>{{ title }}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f2f5;
-      margin: 0;
-      padding: 0;
-    }
-
-    .header {
-      text-align: center;
-      padding: 30px 20px 15px;
-      background-color: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    .header img {
-      width: 100px;
-      height: auto;
-      margin-bottom: 10px;
-    }
-
-    .header h1 {
-      font-size: 2rem;
-      margin: 0;
-      color: #0d2b45;
-    }
-
-    .header .subtitle {
-      font-size: 1rem;
-      color: #666;
-    }
-
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin: 20px;
-    }
-
-    .filters input,
-    .filters select {
-      padding: 10px;
-      font-size: 14px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      min-width: 180px;
-    }
-
-    .copy-btn {
-      padding: 10px 20px;
-      background-color: #0066cc;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .grid {
-      max-width: 1200px;
-      margin: auto;
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-    }
-
     .card {
-      background-color: white;
-      padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
     }
 
-    .card h3 {
-      color: #007bff;
-      margin-top: 0;
-    }
-
-    .card p {
-      margin: 6px 0;
-    }
-
-    .label {
+    .card-header {
+      background-color: #0d47a1;
+      color: white;
       font-weight: bold;
+    }
+
+    .card-body p {
+      margin: 0.3rem 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin-top: 30px;
     }
 
     @media (max-width: 600px) {
-      .filters {
-        flex-direction: column;
-        align-items: center;
+      .card-body {
+        font-size: 14px;
       }
     }
   </style>
 </head>
-<body>
+<body class="bg-light">
 
-  <div class="header">
-    <img src="{{ url_for('static', filename='dojo_banzai_logo.jpg') }}" alt="Logo">
-    <h1>{{ title }}</h1>
-    <p class="subtitle">Competición oficial - Modalidad Kata</p>
-  </div>
+<div class="container">
+  <h1 class="text-center text-primary mb-4">{{ title }}</h1>
 
-  <div class="filters">
-    <input type="text" id="searchInput" placeholder="🔍 Buscar competidor...">
-    <select id="categoryFilter">
-      <option value="">📊 Todas las categorías</option>
-    </select>
-    <select id="poolFilter">
-      <option value="">🏊 Todos los pools</option>
-    </select>
-    <button class="copy-btn" onclick="copyLink()">🔗 Compartir</button>
-  </div>
-
-  <div class="grid" id="cardsGrid">
-    {% for d in data %}
-    <div class="card" data-name="{{ d['Nombre y Apellido']|lower }}" data-category="{{ d['Categoría'] }}" data-pool="{{ d['Pool'] }}">
-      <h3>{{ d['Nombre y Apellido'] }}</h3>
-      <p><span class="label">Categoría:</span> {{ d['Categoría'] }}</p>
-      <p><span class="label">Kata:</span> {{ d['Nombre Kata'] }}</p>
-      <p><span class="label">Tatami:</span> {{ d['Tatami'] }}</p>
-      <p><span class="label">Pool:</span> {{ d['Pool'] }}</p>
+  {% for item in data %}
+    <div class="card">
+      <div class="card-header">
+        {{ item["Nombre y Apellido"] }}
+      </div>
+      <div class="card-body">
+        <p><strong>Categoría:</strong> {{ item["Categoría"] }}</p>
+        <p><strong>Kata:</strong> {{ item["Nombre Kata"] }}</p>
+        <p><strong>Tatami:</strong> {{ item["Tatami"] }}</p>
+        <p><strong>Pool:</strong> {{ item["Pool"] }}</p>
+      </div>
     </div>
-    {% endfor %}
-  </div>
+  {% endfor %}
+</div>
 
-  <script>
-    const searchInput = document.getElementById('searchInput');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const poolFilter = document.getElementById('poolFilter');
-    const cards = document.querySelectorAll('.card');
-
-    function updateFilters() {
-      const name = searchInput.value.toLowerCase();
-      const cat = categoryFilter.value;
-      const pool = poolFilter.value;
-
-      cards.forEach(card => {
-        const matchesName = card.dataset.name.includes(name);
-        const matchesCat = !cat || card.dataset.category === cat;
-        const matchesPool = !pool || card.dataset.pool === pool;
-
-        card.style.display = (matchesName && matchesCat && matchesPool) ? 'block' : 'none';
-      });
-    }
-
-    function copyLink() {
-      navigator.clipboard.writeText(window.location.href).then(() => {
-        alert("✅ Enlace copiado al portapapeles");
-      });
-    }
-
-    function populateFilters() {
-      const cats = new Set();
-      const pools = new Set();
-      cards.forEach(card => {
-        cats.add(card.dataset.category);
-        pools.add(card.dataset.pool);
-      });
-
-      cats.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat;
-        option.textContent = cat;
-        categoryFilter.appendChild(option);
-      });
-
-      pools.forEach(pool => {
-        const option = document.createElement('option');
-        option.value = pool;
-        option.textContent = pool;
-        poolFilter.appendChild(option);
-      });
-    }
-
-    searchInput.addEventListener('input', updateFilters);
-    categoryFilter.addEventListener('change', updateFilters);
-    poolFilter.addEventListener('change', updateFilters);
-
-    populateFilters();
-  </script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
