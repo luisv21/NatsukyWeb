@@ -20,7 +20,7 @@ os.makedirs(DATA_CACHE, exist_ok=True)
 
 try:
     FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-    font = ImageFont.truetype(FONT_PATH, 32)
+    font = ImageFont.truetype(FONT_PATH, 28)
 except:
     font = ImageFont.load_default()
 
@@ -61,15 +61,23 @@ def create_cards_from_excel(file_path, mode):
     elif mode == "categoria":
         grouped = df.groupby("Categoría")
         for categoria, group in grouped:
-            img = Image.new("RGB", (1000, 100 + 80 * len(group)), color="white")
+            height = 100 + 60 * len(group)
+            img = Image.new("RGB", (1000, height), color="#f7f7f7")
             draw = ImageDraw.Draw(img)
-            draw.rectangle([0, 0, 1000, 80], fill="#004466")
+
+            draw.rectangle([0, 0, 1000, 80], fill="#005577")
             draw.text((20, 20), f"Categoría: {categoria}", fill="white", font=font)
+
             y = 100
             for _, row in group.iterrows():
-                text = f"{row['Nombre y Apellido']} - Kata: {row['Nombre Kata']} - Tatami: {row['Tatami']} - Pool: {row['Pool']}"
-                draw.text((40, y), text, fill="#000", font=font)
-                y += 60
+                nombre = row['Nombre y Apellido']
+                kata = row['Nombre Kata']
+                tatami = row['Tatami']
+                pool = row['Pool']
+                texto = f"👤 {nombre}   🥋 {kata}   🏟️ Tatami {tatami}   🏊 Pool {pool}"
+                draw.text((40, y), texto, fill="#000", font=font)
+                y += 50
+
             safe_categoria = "_".join(categoria.lower().split())
             output_path = os.path.join(temp_dir, f"categoria_{safe_categoria}.png")
             img.save(output_path)
