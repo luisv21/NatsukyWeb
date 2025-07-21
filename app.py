@@ -24,7 +24,6 @@ try:
 except:
     font = ImageFont.load_default()
 
-
 def generate_card(data_row, output_path):
     img = Image.new("RGB", (800, 500), color="white")
     draw = ImageDraw.Draw(img)
@@ -42,7 +41,6 @@ def generate_card(data_row, output_path):
         draw.text((40, y), f"{label}: {value}", fill="#000", font=font)
         y += 60
     img.save(output_path)
-
 
 def create_cards_from_excel(file_path, mode):
     df = pd.read_excel(file_path)
@@ -80,12 +78,13 @@ def create_cards_from_excel(file_path, mode):
 
     return zip_output
 
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        file = request.files['excel']
-        mode = request.form['mode']
+        file = request.files.get('archivo')
+        mode = request.form.get('modo')
+        titulo = request.form.get('titulo')
+
         if file:
             filepath = os.path.join(UPLOAD_FOLDER, file.filename)
             file.save(filepath)
@@ -93,9 +92,8 @@ def index():
             session_id = str(uuid.uuid4())
             data_path = os.path.join(DATA_CACHE, f"{session_id}.csv")
             df.to_csv(data_path, index=False)
-            return redirect(url_for('cards', session_id=session_id))
+            return redirect(url_for('cards', session_id=session_id, title=titulo))
     return render_template("index.html")
-
 
 @app.route('/cards/<session_id>')
 def cards(session_id):
@@ -103,10 +101,8 @@ def cards(session_id):
     if not os.path.exists(data_path):
         return "Datos no encontrados", 404
     df = pd.read_csv(data_path)
-    return render_template("cards.html", data=df.to_dict(orient="records"))
-
-
-# ========= NUEVAS FUNCIONALIDADES =========
+    title = request.args.get("title", "Torneo Kyodai")
+    return render_template("cards.html", data=df.to_dict(orient="records"), title=title)
 
 def generar_datos_dummy(n=6):
     NOMBRES = ["Lucía Ramos", "Diego Torres", "Valentina Gómez", "Luis Mendoza", "Sofía Romero", "Mateo López"]
@@ -126,12 +122,10 @@ def generar_datos_dummy(n=6):
         })
     return data
 
-
 @app.route('/preview')
 def preview():
     dummy_data = generar_datos_dummy(6)
     return render_template("cards.html", data=dummy_data, title="Vista de Ejemplo")
-
 
 @app.route('/example.xlsx')
 def descargar_ejemplo():
@@ -145,9 +139,6 @@ def descargar_ejemplo():
     response.headers["Content-Disposition"] = "attachment; filename=Ejemplo_Torneo_Kyodai.xlsx"
     response.headers["Content-type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     return response
-
-
-# ========== FIN DE CAMBIOS =========
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
